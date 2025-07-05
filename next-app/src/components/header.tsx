@@ -1,4 +1,4 @@
-const Car = () => {
+const Header = () => {
   /**VARIABLES */
 
   /**FUNCTIONS */
@@ -6,9 +6,9 @@ const Car = () => {
   /**COMPONENT */
   return (
     <div>
-      <div>Navbar</div>
+      <div>Header</div>
     </div>
   );
 };
 
-export default Car;
+export default Header;
