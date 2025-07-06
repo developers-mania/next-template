@@ -1,1 +1,1 @@
-// Server Actions (private to this feature)
+// Utility functions (private to this feature)
