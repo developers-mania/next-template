@@ -28,23 +28,40 @@ const SignupForm = () => {
 
   /**COMPONENT */
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input label="Name" name="name" autoComplete="name" required />
-      <Input label="Email" name="email" type="email" autoComplete="email" required />
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <Input
-        label="Password"
+        id="signup-name"
+        name="name"
+        label="Name"
+        autoComplete="name"
+        required
+      />
+      <Input
+        id="signup-email"
+        name="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
+        required
+      />
+      <Input
+        id="signup-password"
         name="password"
+        label="Password"
         type="password"
         autoComplete="new-password"
+        hint="At least 8 characters"
         minLength={8}
         required
       />
+
       {error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-red-600">
           {getErrorMessage(error)}
         </p>
       )}
-      <Button type="submit" className="w-full" isLoading={isLoading}>
+
+      <Button type="submit" block loading={isLoading}>
         Create account
       </Button>
     </form>

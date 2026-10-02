@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ProjectList from "./_components/ProjectList";
 import ProjectStats from "./_components/ProjectStats";
+import WelcomeHeader from "./_components/WelcomeHeader";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -13,14 +14,11 @@ export const metadata: Metadata = {
 const DashboardPage = () => {
   /**COMPONENT */
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <p className="text-muted-foreground">An overview of your projects.</p>
-      </div>
+    <>
+      <WelcomeHeader />
       <ProjectStats />
       <ProjectList />
-    </div>
+    </>
   );
 };
 

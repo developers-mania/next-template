@@ -10,7 +10,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar />
-          <main className="flex-1 p-4 sm:p-8">{children}</main>
+          <main className="page flex-1">{children}</main>
         </div>
       </div>
     </AuthGuard>

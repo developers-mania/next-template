@@ -13,7 +13,8 @@ export const makeStore = () =>
       ui: uiReducer,
       [baseApi.reducerPath]: baseApi.reducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(baseApi.middleware),
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

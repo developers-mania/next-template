@@ -1,12 +1,8 @@
-import Spinner from "@/components/ui/Spinner";
+import StateLoading from "@/components/ui/StateLoading";
 
 /** Shown automatically by Next.js while the dashboard route loads. */
 const DashboardLoading = () => {
-  return (
-    <div className="flex justify-center py-12">
-      <Spinner />
-    </div>
-  );
+  return <StateLoading label="Loading dashboard..." />;
 };
 
 export default DashboardLoading;

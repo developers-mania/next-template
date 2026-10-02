@@ -2,58 +2,51 @@
 
 import Link from "next/link";
 import StatusBadge from "@/components/shared/StatusBadge";
-import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import Spinner from "@/components/ui/Spinner";
+import StateEmpty from "@/components/ui/StateEmpty";
+import StateError from "@/components/ui/StateError";
+import StateLoading from "@/components/ui/StateLoading";
 import { ROUTES } from "@/constants";
+import { getErrorMessage } from "@/lib/utils";
 import { useGetProjectsQuery } from "@/store/api/projectsApi";
 
 const ProjectList = () => {
   /**VARIABLES */
-  const { data: projects, isLoading, isError, refetch } = useGetProjectsQuery();
+  const { data: projects, isLoading, error, refetch } = useGetProjectsQuery();
 
   /**COMPONENT */
-  if (isLoading) {
-    return (
-      <Card className="flex justify-center">
-        <Spinner />
-      </Card>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Card className="flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground">Could not load projects.</p>
-        <Button variant="outline" size="sm" onClick={() => refetch()}>
-          Retry
-        </Button>
-      </Card>
-    );
-  }
-
-  if (!projects?.length) {
-    return <Card className="text-sm text-muted-foreground">No projects yet.</Card>;
-  }
-
   return (
-    <Card className="p-0">
-      <ul className="divide-y divide-border">
-        {projects.map((project) => (
-          <li key={project.id}>
-            <Link
-              href={ROUTES.project(project.id)}
-              className="flex items-center justify-between gap-4 p-4 hover:bg-muted"
+    <Card className="mt-6" title="Projects">
+      {isLoading ? (
+        <StateLoading label="Loading projects..." />
+      ) : error ? (
+        <StateError
+          message={getErrorMessage(error, "Could not load projects.")}
+          onRetry={refetch}
+        />
+      ) : !projects?.length ? (
+        <StateEmpty title="No projects yet" />
+      ) : (
+        <ul className="divide-y divide-gray-200 dark:divide-gray-800">
+          {projects.map((project) => (
+            <li
+              key={project.id}
+              className="flex items-center justify-between gap-4 py-3"
             >
               <div className="min-w-0">
-                <p className="font-medium">{project.name}</p>
-                <p className="truncate text-sm text-muted-foreground">{project.description}</p>
+                <Link
+                  href={ROUTES.project(project.id)}
+                  className="font-medium hover:underline"
+                >
+                  {project.name}
+                </Link>
+                <p className="muted truncate text-sm">{project.description}</p>
               </div>
               <StatusBadge status={project.status} />
-            </Link>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   );
 };

@@ -6,7 +6,8 @@ export async function POST(request: Request) {
   const { name, email, password } = (await request.json()) as SignupRequest;
   await delay();
 
-  if (!name || !email || !password) return errorResponse("Name, email and password are required", 400);
+  if (!name || !email || !password)
+    return errorResponse("Name, email and password are required", 400);
   if (db.users.some((storedUser) => storedUser.email === email)) {
     return errorResponse("An account with this email already exists", 409);
   }

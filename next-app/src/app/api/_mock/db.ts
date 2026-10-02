@@ -17,7 +17,14 @@ const SESSION_COOKIE = "session";
 const globalForMock = globalThis as typeof globalThis & { mockDb?: MockDb };
 
 export const db: MockDb = (globalForMock.mockDb ??= {
-  users: [{ id: "1", name: "Demo User", email: "demo@example.com", password: "password" }],
+  users: [
+    {
+      id: "1",
+      name: "Demo User",
+      email: "demo@example.com",
+      password: "password",
+    },
+  ],
   projects: [
     {
       id: "1",
@@ -51,12 +58,20 @@ export const db: MockDb = (globalForMock.mockDb ??= {
 });
 
 /** Remove the password before sending a user to the browser. */
-const toPublicUser = ({ id, name, email }: StoredUser): User => ({ id, name, email });
+const toPublicUser = ({ id, name, email }: StoredUser): User => ({
+  id,
+  name,
+  email,
+});
 
 /** Respond with the user and set the session cookie. The cookie is just the user id, which is fine for a mock only! */
 export const startSession = (user: StoredUser) => {
   const response = NextResponse.json(toPublicUser(user));
-  response.cookies.set(SESSION_COOKIE, user.id, { httpOnly: true, sameSite: "lax", path: "/" });
+  response.cookies.set(SESSION_COOKIE, user.id, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+  });
   return response;
 };
 
@@ -74,7 +89,9 @@ export const getSessionUser = async () => {
 };
 
 /** Error responses use `{ message }`, which is what `getErrorMessage` in lib/utils expects. */
-export const errorResponse = (message: string, status: number) => NextResponse.json({ message }, { status });
+export const errorResponse = (message: string, status: number) =>
+  NextResponse.json({ message }, { status });
 
 /** Fake network latency so loading states are visible. */
-export const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
+export const delay = (ms = 400) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

@@ -11,9 +11,32 @@ const ProfileForm = () => {
 
   /**COMPONENT */
   return (
-    <Card className="space-y-4">
-      <Input label="Name" name="name" defaultValue={user?.name} readOnly />
-      <Input label="Email" name="email" type="email" defaultValue={user?.email} readOnly />
+    <Card
+      className="mt-8"
+      title="Profile"
+      footer={
+        <p className="muted text-xs">
+          Profile editing is not connected to the API yet.
+        </p>
+      }
+    >
+      <div className="flex flex-col gap-5">
+        <Input
+          id="profile-name"
+          name="name"
+          label="Name"
+          defaultValue={user?.name}
+          readOnly
+        />
+        <Input
+          id="profile-email"
+          name="email"
+          label="Email"
+          type="email"
+          defaultValue={user?.email}
+          readOnly
+        />
+      </div>
     </Card>
   );
 };

@@ -12,10 +12,25 @@ const ProjectStats = () => {
 
   /**COMPONENT */
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
-      <StatCard label="Total projects" value={stats.total} isLoading={isLoading} />
-      <StatCard label="Active" value={stats.active} isLoading={isLoading} />
-      <StatCard label="Completed" value={stats.done} isLoading={isLoading} />
+    <div className="mt-8 grid gap-5 sm:grid-cols-3">
+      <StatCard
+        label="Projects"
+        value={stats.total}
+        caption="in your workspace"
+        isLoading={isLoading}
+      />
+      <StatCard
+        label="Active"
+        value={stats.active}
+        caption="being worked on"
+        isLoading={isLoading}
+      />
+      <StatCard
+        label="Completed"
+        value={stats.done}
+        caption="shipped"
+        isLoading={isLoading}
+      />
     </div>
   );
 };

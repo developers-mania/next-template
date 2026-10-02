@@ -4,6 +4,7 @@ A Next.js 16 starter for client-side apps that talk to a **separate backend**. I
 
 - **Next.js 16** (App Router, Turbopack), **React 19**, **TypeScript**, **Tailwind CSS 4**
 - **Redux Toolkit** for app state and **RTK Query** for API calls
+- The same design system and Developers Mania branding as the Vue template (see [UI and branding](#ui-and-branding))
 - A working example of every piece: public pages, login/signup, a protected dashboard, a dynamic route and a mock API
 - Lean tooling: ESLint, Prettier, Vitest + Testing Library, and GitHub Actions CI
 
@@ -41,7 +42,8 @@ CI (`.github/workflows/ci.yml` at the repo root) runs the same checks plus a bui
 src/
 ├── app/                          # Routes: every folder is a URL segment
 │   ├── layout.tsx                # Root layout: fonts, metadata, <Providers>
-│   ├── globals.css               # Tailwind + design tokens (colors, fonts)
+│   ├── globals.css               # Design tokens (brand palette, font) + .page / .muted classes
+│   ├── icon.png                  # Favicon (the Developers Mania mark)
 │   ├── error.tsx                 # Shown when a page throws
 │   ├── not-found.tsx             # 404 page
 │   │
@@ -71,8 +73,8 @@ src/
 │   └── api/                      # MOCK backend: delete once your real API is ready
 │
 ├── components/
-│   ├── ui/                       # Generic building blocks: Button, Input, Card, Spinner
-│   └── shared/                   # App-specific pieces used in several places: Header, Footer, StatusBadge
+│   ├── ui/                       # Generic building blocks: Button, Card, Input, Badge, Spinner, State*
+│   └── shared/                   # App-specific pieces used in several places: AppLogo, Header, Footer, StatusBadge
 ├── constants/                    # SITE info, ROUTES, navigation links
 ├── hooks/                        # Shared React hooks (useAuth)
 ├── lib/                          # Shared helpers: cn(), formatDate(), env
@@ -154,12 +156,33 @@ For a new feature, create a file next to `projectsApi.ts` that calls `baseApi.in
 
 `AuthGuard` only controls what the UI shows. Your backend must check auth on every request.
 
+## UI and branding
+
+The UI follows the same standard as the Vue template, so moving between the two is predictable:
+
+- **Brand palette.** `brand-50` to `brand-900` in `src/app/globals.css` are keyed to the logo red (#fb260b). Use `bg-brand-600` for fills behind white text (the logo red itself is too light for 4.5:1 contrast). Neutrals are Tailwind's `gray`.
+- **Shared classes.** `.page` (max-w-6xl) and `.page-narrow` (max-w-3xl) give every page the same gutter, and `.muted` is secondary text. Pages use these instead of their own containers.
+- **Components** match the Vue `Base*` components:
+
+  | Vue                                          | Next                                         |
+  | -------------------------------------------- | -------------------------------------------- |
+  | `BaseButton`                                 | `Button` (+ `buttonStyles()` for links)      |
+  | `BaseCard`                                   | `Card` (`title`, `header`, `footer`, `href`) |
+  | `BaseInput`                                  | `Input` (`label`, `hint`, `error`)           |
+  | `BaseBadge`                                  | `Badge` (`tone`)                             |
+  | `BaseSpinner`                                | `Spinner`                                    |
+  | `StateLoading` / `StateError` / `StateEmpty` | same names                                   |
+  | `AppLogo`                                    | `AppLogo`                                    |
+
+- **Dark mode** follows the OS setting via Tailwind's `dark:` variants.
+- **Rebranding.** Replace `public/logo-developers-mania.png` (the logo) and `src/app/icon.png` (the favicon), then adjust the brand shades in `globals.css`.
+
 ## Conventions
 
 - **File names:** `PascalCase.tsx` for components, `camelCase.ts` for everything else, `useSomething.ts` for hooks.
 - **Components:** arrow functions with a default export, with `/**VARIABLES */`, `/**FUNCTIONS */` and `/**COMPONENT */` sections.
 - **Imports:** always use the `@/` alias for `src/` (`@/components/ui/Button`) instead of long relative paths.
-- **Styling:** Tailwind classes; colors come from the tokens in `globals.css` (`bg-card`, `text-muted-foreground`, `border-border`...). Use `cn()` to combine classes.
+- **Styling:** Tailwind classes, using the brand palette and shared classes above. Add a variant to a `ui/` component rather than pasting class strings into a page. Use `cn()` to combine classes.
 - **Tests:** next to the code they test, as `*.test.ts(x)`.
 
 ## Learn more

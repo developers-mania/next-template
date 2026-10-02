@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { db, delay, errorResponse, getSessionUser } from "@/app/api/_mock/db";
 
 /** GET /api/projects/:id */
-export async function GET(_request: Request, { params }: RouteContext<"/api/projects/[id]">) {
+export async function GET(
+  _request: Request,
+  { params }: RouteContext<"/api/projects/[id]">,
+) {
   if (!(await getSessionUser())) return errorResponse("Not authenticated", 401);
   const { id } = await params;
   await delay();

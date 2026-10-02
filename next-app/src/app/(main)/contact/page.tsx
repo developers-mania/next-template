@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Card from "@/components/ui/Card";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -7,16 +8,23 @@ export const metadata: Metadata = {
 const Contact = () => {
   /**COMPONENT */
   return (
-    <article className="max-w-2xl space-y-4">
-      <h1 className="text-3xl font-bold">Contact</h1>
-      <p className="text-muted-foreground">
-        Questions or feedback? Email us at{" "}
-        <a href="mailto:hello@example.com" className="font-medium text-foreground underline">
+    <div className="page-narrow max-w-xl">
+      <h1 className="text-3xl font-semibold tracking-tight">Contact us</h1>
+      <p className="muted mt-3">
+        Questions, feedback or a bug to report? We usually reply within one
+        working day.
+      </p>
+
+      <Card className="mt-8">
+        <p className="muted text-sm">Email</p>
+        <a
+          href="mailto:hello@example.com"
+          className="mt-1 inline-block text-lg font-semibold text-brand-600 hover:underline dark:text-brand-200"
+        >
           hello@example.com
         </a>
-        .
-      </p>
-    </article>
+      </Card>
+    </div>
   );
 };
 

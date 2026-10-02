@@ -1,23 +1,18 @@
-import { cn } from "@/lib/utils";
+import Badge, { type BadgeTone } from "@/components/ui/Badge";
 import type { ProjectStatus } from "@/types";
 
-const STATUS_STYLES: Record<ProjectStatus, string> = {
-  active: "bg-green-500/15 text-green-700 dark:text-green-400",
-  paused: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
-  done: "bg-muted text-muted-foreground",
+const STATUS_TONES: Record<ProjectStatus, BadgeTone> = {
+  active: "success",
+  paused: "warning",
+  done: "neutral",
 };
 
 /** Used by both the dashboard and project pages, so it lives in components/shared. */
 const StatusBadge = ({ status }: { status: ProjectStatus }) => {
   return (
-    <span
-      className={cn(
-        "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-        STATUS_STYLES[status],
-      )}
-    >
+    <Badge tone={STATUS_TONES[status]} className="shrink-0 capitalize">
       {status}
-    </span>
+    </Badge>
   );
 };
 

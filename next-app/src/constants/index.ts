@@ -2,7 +2,9 @@
 
 export const SITE = {
   name: "Next Template",
-  description: "A Next.js + Redux starter for apps that talk to a separate backend.",
+  description:
+    "A Next.js + Redux starter for apps that talk to a separate backend.",
+  owner: "Info-Space Meta",
 } as const;
 
 export const ROUTES = {
@@ -16,9 +18,8 @@ export const ROUTES = {
   project: (id: string) => `/projects/${id}`,
 } as const;
 
-/** Links shown in the public site header. */
+/** Links shown in the public site header. The logo links home. */
 export const MAIN_NAV = [
-  { label: "Home", href: ROUTES.home },
   { label: "About", href: ROUTES.about },
   { label: "Contact", href: ROUTES.contact },
 ] as const;

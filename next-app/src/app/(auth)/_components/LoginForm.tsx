@@ -27,16 +27,32 @@ const LoginForm = () => {
 
   /**COMPONENT */
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Input label="Email" name="email" type="email" autoComplete="email" required />
-      <Input label="Password" name="password" type="password" autoComplete="current-password" required />
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <Input
+        id="login-email"
+        name="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
+        required
+      />
+      <Input
+        id="login-password"
+        name="password"
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        required
+      />
+
       {error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-red-600">
           {getErrorMessage(error)}
         </p>
       )}
-      <Button type="submit" className="w-full" isLoading={isLoading}>
-        Log in
+
+      <Button type="submit" block loading={isLoading}>
+        Sign in
       </Button>
     </form>
   );

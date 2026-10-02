@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { APP_NAV, ROUTES, SITE } from "@/constants";
+import AppLogo from "@/components/shared/AppLogo";
+import { APP_NAV, ROUTES } from "@/constants";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectSidebarOpen } from "@/store/selectors";
@@ -24,34 +25,37 @@ const Sidebar = () => {
       {isOpen && (
         <button
           aria-label="Close menu"
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
           onClick={close}
         />
       )}
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-60 -translate-x-full border-r border-border bg-background p-4 transition-transform md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 -translate-x-full border-r border-gray-200 bg-gray-50 transition-transform md:sticky md:top-0 md:h-screen md:translate-x-0 dark:border-gray-800 dark:bg-gray-900",
           isOpen && "translate-x-0",
         )}
       >
-        <Link href={ROUTES.home} className="mb-6 block px-3 py-2 font-semibold">
-          {SITE.name}
-        </Link>
-        <nav className="flex flex-col gap-1">
-          {APP_NAV.map((item) => (
+        <div className="flex h-16 items-center border-b border-gray-200 px-4 dark:border-gray-800">
+          <Link href={ROUTES.home} onClick={close}>
+            <AppLogo />
+          </Link>
+        </div>
+
+        <nav aria-label="App" className="flex flex-col gap-1 p-3">
+          {APP_NAV.map((link) => (
             <Link
-              key={item.href}
-              href={item.href}
+              key={link.href}
+              href={link.href}
               onClick={close}
               className={cn(
-                "rounded-md px-3 py-2 text-sm",
-                pathname.startsWith(item.href)
-                  ? "bg-muted font-medium"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                "rounded-md px-3 py-2 text-sm transition-colors",
+                pathname.startsWith(link.href)
+                  ? "bg-gray-200/70 font-medium text-gray-900 dark:bg-gray-800 dark:text-white"
+                  : "muted hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-white",
               )}
             >
-              {item.label}
+              {link.label}
             </Link>
           ))}
         </nav>

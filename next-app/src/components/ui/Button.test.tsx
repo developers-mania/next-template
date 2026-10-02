@@ -12,8 +12,14 @@ describe("Button", () => {
     expect(onClick).toHaveBeenCalledOnce();
   });
 
-  it("is disabled while loading", () => {
-    render(<Button isLoading>Save</Button>);
-    expect(screen.getByRole("button")).toBeDisabled();
+  it("defaults to type=button so it never submits a form by accident", () => {
+    render(<Button>Save</Button>);
+    expect(screen.getByRole("button")).toHaveAttribute("type", "button");
+  });
+
+  it("is disabled and shows a spinner while loading", () => {
+    render(<Button loading>Save</Button>);
+    expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
   });
 });

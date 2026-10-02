@@ -12,13 +12,26 @@ const Topbar = () => {
 
   /**COMPONENT */
   return (
-    <header className="flex h-16 items-center gap-4 border-b border-border px-4 sm:px-8">
-      <Button variant="ghost" size="sm" className="md:hidden" onClick={() => dispatch(toggleSidebar())}>
-        Menu
-      </Button>
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white/90 px-4 backdrop-blur sm:px-6 dark:border-gray-800 dark:bg-gray-950/90">
+      {/* Mobile menu toggle: the sidebar is hidden below md */}
+      <button
+        className="rounded-md p-2 text-gray-700 hover:bg-gray-100 md:hidden dark:text-gray-200 dark:hover:bg-gray-800"
+        aria-label="Toggle navigation"
+        onClick={() => dispatch(toggleSidebar())}
+      >
+        <span aria-hidden="true" className="block text-lg leading-none">
+          ☰
+        </span>
+      </button>
+
       <div className="ml-auto flex items-center gap-3">
-        <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
-        <Button variant="outline" size="sm" onClick={logout} isLoading={isLoggingOut}>
+        <span className="muted hidden text-sm sm:inline">{user?.email}</span>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={logout}
+          loading={isLoggingOut}
+        >
           Log out
         </Button>
       </div>

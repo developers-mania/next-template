@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Spinner from "@/components/ui/Spinner";
+import StateLoading from "@/components/ui/StateLoading";
 import { ROUTES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -23,7 +23,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   if (!user) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <Spinner />
+        <StateLoading label="Checking your session..." />
       </div>
     );
   }

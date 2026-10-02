@@ -12,7 +12,12 @@ const project = (status: Project["status"]): Project => ({
 
 describe("getProjectStats", () => {
   it("counts projects by status", () => {
-    const projects = [project("active"), project("active"), project("paused"), project("done")];
+    const projects = [
+      project("active"),
+      project("active"),
+      project("paused"),
+      project("done"),
+    ];
     expect(getProjectStats(projects)).toEqual({ total: 4, active: 2, done: 1 });
   });
 

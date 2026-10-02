@@ -17,5 +17,11 @@ export const useAuth = () => {
     dispatch(baseApi.util.resetApiState());
   };
 
-  return { user: isError ? undefined : data, isLoading, isError, logout, isLoggingOut };
+  return {
+    user: isError ? undefined : data,
+    isLoading,
+    isError,
+    logout,
+    isLoggingOut,
+  };
 };

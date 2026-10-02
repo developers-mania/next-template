@@ -1,7 +1,10 @@
 "use client"; // Error boundaries must be Client Components
 
+import Link from "next/link";
 import { useEffect } from "react";
-import Button from "@/components/ui/Button";
+import AppLogo from "@/components/shared/AppLogo";
+import Button, { buttonStyles } from "@/components/ui/Button";
+import { ROUTES } from "@/constants";
 
 type ErrorProps = {
   error: Error & { digest?: string };
@@ -18,11 +21,20 @@ const ErrorPage = ({ error, retry }: ErrorProps) => {
 
   /**COMPONENT */
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
-      <h1 className="text-2xl font-semibold">Something went wrong</h1>
-      <Button variant="outline" onClick={() => retry()}>
-        Try again
-      </Button>
+    <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
+      <AppLogo size="lg" withWordmark={false} />
+      <h1 className="text-2xl font-semibold tracking-tight">
+        Something went wrong
+      </h1>
+      <p className="muted">
+        An unexpected error stopped this page from loading.
+      </p>
+      <div className="mt-2 flex flex-wrap justify-center gap-2">
+        <Button onClick={() => retry()}>Try again</Button>
+        <Link href={ROUTES.home} className={buttonStyles({ variant: "ghost" })}>
+          Back to home
+        </Link>
+      </div>
     </main>
   );
 };

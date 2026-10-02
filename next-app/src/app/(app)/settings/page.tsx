@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 const SettingsPage = () => {
   /**COMPONENT */
   return (
-    <div className="max-w-xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="text-muted-foreground">Your account details.</p>
-      </div>
+    <div className="max-w-2xl">
+      <header>
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <p className="muted mt-1 text-sm">Your account details.</p>
+      </header>
       <ProfileForm />
     </div>
   );
