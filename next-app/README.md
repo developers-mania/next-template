@@ -1,133 +1,169 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next Template
 
-## Getting Started
+A Next.js 16 starter for client-side apps that talk to a **separate backend**. It comes with:
 
-First, run the development server:
+- **Next.js 16** (App Router, Turbopack), **React 19**, **TypeScript**, **Tailwind CSS 4**
+- **Redux Toolkit** for app state and **RTK Query** for API calls
+- A working example of every piece: public pages, login/signup, a protected dashboard, a dynamic route and a mock API
+- Lean tooling: ESLint, Prettier, Vitest + Testing Library, and GitHub Actions CI
+
+## Quick start
+
+Requires Node.js 20.9 or newer (see `.nvmrc`).
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Log in with **demo@example.com / password**, or sign up.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The template runs with no backend: requests go to a small mock API in `src/app/api`. To use your own backend, see [Connecting your backend](#connecting-your-backend).
 
-## Recommended Production-Level File Organization
+## Scripts
 
-Here is a comprehensive, production-ready structure that combines the App Router's conventions with best practices for scalability.
+| Command             | What it does                                       |
+| ------------------- | -------------------------------------------------- |
+| `npm run dev`       | Start the dev server                               |
+| `npm run build`     | Production build                                   |
+| `npm start`         | Serve the production build                         |
+| `npm run lint`      | ESLint                                             |
+| `npm run typecheck` | TypeScript check                                   |
+| `npm run format`    | Format every file with Prettier                    |
+| `npm test`          | Run the tests once (`npm run test:watch` to watch) |
+| `npm run check`     | Lint + typecheck + format check + tests            |
+
+CI (`.github/workflows/ci.yml` at the repo root) runs the same checks plus a build on every push and pull request.
+
+## Project structure
 
 ```txt
-.
-├── /public/                      # Static assets (images, fonts, etc.)
-├── /src/                         # Optional but recommended 'src' directory
-│   ├── /app/                     # The core of your application and routing
-│   │   ├── /api/                 # Route Handlers for your API endpoints
-│   │   │   └── /users
-│   │   │       └── route.ts      # -> /api/users
-│   │   │
-│   │   ├── /(main)/              # A Route Group for main app pages (e.g., with main navbar/footer)
-│   │   │   ├── /dashboard/       # FEATURE: Dashboard (Route: /dashboard)
-│   │   │   │   ├── page.tsx      # UI for the page
-│   │   │   │   ├── layout.tsx    # Layout specific to this feature
-│   │   │   │   ├── loading.tsx   # Loading UI specific to this feature
-│   │   │   │   ├── /components/  # Components used ONLY within the dashboard feature
-│   │   │   │   │   ├── StatCard.tsx
-│   │   │   │   │   └── ProjectList.tsx
-│   │   │   │   ├── _actions.ts   # Server Actions (private to this feature)
-│   │   │   │   └── _lib.ts       # Utility functions (private to this feature)
-│   │   │   │
-│   │   │   ├── /settings/        # FEATURE: Settings (Route: /settings)
-│   │   │   │   ├── page.tsx
-│   │   │   │   └── ... (similar structure as dashboard)
-│   │   │   │
-│   │   │   └── page.tsx          # Homepage UI (Route: /)
-│   │   │
-│   │   ├── /(auth)/              # A Route Group for auth pages (e.g., with a different, simpler layout)
-│   │   │   ├── /login/
-│   │   │   │   └── page.tsx
-│   │   │   ├── /signup/
-│   │   │   │   └── page.tsx
-│   │   │   └── layout.tsx        # Shared layout for ONLY login and signup
-│   │   │
-│   │   ├── layout.tsx            # ROOT layout (applies to everything)
-│   │   └── globals.css           # Global styles
+src/
+├── app/                          # Routes: every folder is a URL segment
+│   ├── layout.tsx                # Root layout: fonts, metadata, <Providers>
+│   ├── globals.css               # Tailwind + design tokens (colors, fonts)
+│   ├── error.tsx                 # Shown when a page throws
+│   ├── not-found.tsx             # 404 page
 │   │
-│   ├── /components/              # SHARED, Reusable Components
-│   │   ├── /ui/                  # Primitive, "dumb" components (like a design system)
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   └── Card.tsx
-│   │   ├── /shared/              # Complex components composed of UI primitives
-│   │   │   ├── MainNav.tsx
-│   │   │   └── PageHeader.tsx
+│   ├── (main)/                   # Public pages, with header + footer
+│   │   ├── layout.tsx
+│   │   ├── page.tsx              # /
+│   │   ├── about/page.tsx        # /about
+│   │   └── contact/page.tsx      # /contact
 │   │
-│   ├── /lib/                     # SHARED helper functions, libraries, SDKs
-│   │   ├── db.ts                 # Database client (Prisma, Drizzle, etc.)
-│   │   ├── auth.ts               # Auth configuration (NextAuth.js, Clerk)
-│   │   ├── utils.ts              # General utility functions (formatting, etc.)
+│   ├── (auth)/                   # Login + signup, with a centered card layout
+│   │   ├── layout.tsx
+│   │   ├── _components/          # LoginForm, SignupForm (used only here)
+│   │   ├── login/page.tsx        # /login
+│   │   └── signup/page.tsx       # /signup
 │   │
-│   ├── /hooks/                   # SHARED custom React hooks
-│   │   ├── use-user.ts
-│   │   └── use-media-query.ts
+│   ├── (app)/                    # Signed-in area: own layout with sidebar + auth guard
+│   │   ├── layout.tsx
+│   │   ├── _components/          # AuthGuard, Sidebar, Topbar
+│   │   ├── dashboard/            # /dashboard
+│   │   │   ├── page.tsx
+│   │   │   ├── loading.tsx
+│   │   │   ├── _components/      # StatCard, ProjectStats, ProjectList
+│   │   │   └── _lib/             # Helpers private to the dashboard (+ their tests)
+│   │   ├── settings/             # /settings
+│   │   └── projects/[id]/        # /projects/1, /projects/2... (dynamic route)
 │   │
-│   ├── /store/                   # Global state management (Zustand, Redux, Jotai)
-│   │   └── user-store.ts
-│   │
-│   ├── /types/                   # Shared TypeScript type definitions
-│   │   └── index.ts
-│   │
-│   └── /constants/               # Application-wide constants
-│       └── index.ts
+│   └── api/                      # MOCK backend: delete once your real API is ready
 │
-├── next.config.mjs               # Next.js configuration
-├── tsconfig.json                 # TypeScript configuration
-└── package.json
+├── components/
+│   ├── ui/                       # Generic building blocks: Button, Input, Card, Spinner
+│   └── shared/                   # App-specific pieces used in several places: Header, Footer, StatusBadge
+├── constants/                    # SITE info, ROUTES, navigation links
+├── hooks/                        # Shared React hooks (useAuth)
+├── lib/                          # Shared helpers: cn(), formatDate(), env
+├── providers/                    # Client-side providers (Redux) wrapped around the app
+├── store/
+│   ├── store.ts                  # makeStore + RootState/AppDispatch types
+│   ├── hooks.ts                  # useAppDispatch, useAppSelector (always use these)
+│   ├── selectors.ts              # Selectors
+│   ├── slices/                   # Redux slices (app state)
+│   └── api/                      # RTK Query endpoints (server data)
+└── types/                        # Shared TypeScript types (match your API responses)
 ```
 
-### Explanation of Key Directories
+### Key ideas
 
-1.  **`src/` directory**: While optional, it's highly recommended. It clearly separates your source code from configuration files at the root, leading to a cleaner project.
+- **Route groups `(name)`.** A folder in brackets groups routes that share a layout, and the name stays out of the URL. `(app)/dashboard` is served at `/dashboard`.
+- **Private folders `_name`.** A folder starting with `_` is never a route, so `_components` and `_lib` hold code that belongs to one feature.
+- **Only `page.tsx` and `route.ts` become URLs.** Other files in `app/` are never served on their own.
+- **Server Components are the default.** Add `"use client"` to the top of a file only when it needs state, effects, event handlers, browser APIs or Redux hooks. Pages stay Server Components so they can export `metadata`, and they render client components for the interactive parts (see `dashboard/page.tsx`).
 
-2.  **`app/`**: This is the heart of the App Router.
-    *   **Route Groups `(...)`**: Folders wrapped in parentheses, like `(main)` or `(auth)`, organize your routes without affecting the URL. This is perfect for applying different layouts to different sections of your app. For example, your main app pages have a full navbar, while your login/signup pages have a simple, centered layout.
-    *   **Feature Folders (`dashboard/`, `settings/`)**: These are your route segments. By adopting the colocation model, each folder becomes a mini-application responsible for its own UI, logic, components, and data fetching.
-    *   **Private Folders `_...`**: Prefixing a folder with an underscore (e.g., `_lib`, `_components`) prevents Next.js from treating it as a URL segment. While the convention is to use `components/` directly, using `_` for non-component files like `_actions.ts` or `_lib.ts` is a great way to signal that they are internal implementation details of that feature and not routable.
+## Where does my code go?
 
-3.  **`components/`**: This is for **truly shared and reusable components**.
-    *   **`/ui`**: For your base design system components (often called atoms). These are highly reusable and application-agnostic (e.g., `Button`, `Dialog`, `Input`). Tools like `shadcn/ui` populate this directory.
-    *   **`/shared`**: For more complex components that are used in multiple places but are specific to your application's domain (e.g., `SiteHeader`, `UserAvatarMenu`).
+| You're adding...                                      | Put it in                            |
+| ----------------------------------------------------- | ------------------------------------ |
+| A new page                                            | `src/app/(group)/your-page/page.tsx` |
+| A component used by **one** page or feature           | that feature's `_components/` folder |
+| A component used by **several** features              | `src/components/shared/`             |
+| A generic, reusable UI element (button, modal...)     | `src/components/ui/`                 |
+| A helper used by one feature                          | that feature's `_lib/` folder        |
+| A helper used everywhere                              | `src/lib/`                           |
+| Calls to a new backend endpoint                       | `src/store/api/` (see below)         |
+| App state shared between pages (UI state, filters...) | `src/store/slices/` (see below)      |
+| A type used in several places                         | `src/types/`                         |
+| A route path, nav link or app-wide setting            | `src/constants/`                     |
 
-4.  **`lib/`**: Your global library. This is for code that can be used anywhere, both on the client and the server. Think database initializations, authentication helpers, and globally used utility functions.
+If a feature-level piece starts being used somewhere else, move it up to the shared folder.
 
-5.  **`hooks/`, `store/`, `types/`, `constants/`**: These folders are for cross-cutting concerns. They are organized by their *type* because they are, by definition, meant to be shared across many different *features*.
+## State management
 
-### Summary: The "Best Way"
+There are two kinds of state, and each has a home:
 
-1.  **Embrace File-System Routing**: Don't fight it. Use the route folders (`app/dashboard`, `app/settings`) as the foundation.
-2.  **Colocate by Feature**: Make each route folder a self-contained module. Place components, server actions, and helper functions related to that feature *inside* its folder. This is the single most important principle for scalability.
-3.  **Use Route Groups `(...)` for Layouts**: Organize sections of your app that share a common layout (e.g., `(main)` vs. `(auth)`) without changing the URL.
-4.  **Distinguish Shared vs. Local**: Have a top-level `/components` folder for truly reusable UI and use local `components/` folders inside feature routes for single-purpose components.
-5.  **Use a `src/` Directory**: Keep your project root clean.
+| Kind                                     | Example                                | Tool                                                                             |
+| ---------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
+| **Server data**: lives in your backend   | the user, projects                     | **RTK Query** in `store/api/`. Handles caching, loading and error states for you |
+| **App state**: lives only in the browser | sidebar open, selected filters, a cart | **Redux slice** in `store/slices/`                                               |
 
-By following this structure, your application will be organized, easy to navigate, and built to scale with your team and your codebase.
+Avoid copying API data into slices. RTK Query already caches it.
 
-## Learn More
+### Add an API endpoint
 
-To learn more about Next.js, take a look at the following resources:
+```ts
+// src/store/api/projectsApi.ts
+createProject: build.mutation<Project, Pick<Project, "name" | "description">>({
+  query: (body) => ({ url: "/projects", method: "POST", body }),
+  invalidatesTags: ["Project"], // refetches every query that provides "Project"
+}),
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+// then export the generated hook
+export const { useCreateProjectMutation } = projectsApi;
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For a new feature, create a file next to `projectsApi.ts` that calls `baseApi.injectEndpoints(...)`.
 
-## Deploy on Vercel
+### Add a slice
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Create `src/store/slices/filtersSlice.ts` (copy `uiSlice.ts`).
+2. Register its reducer in `src/store/store.ts`.
+3. Add selectors to `src/store/selectors.ts`.
+4. In a client component: `useAppSelector(selectX)` to read and `useAppDispatch()` to update.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Connecting your backend
+
+1. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_URL`, e.g. `http://localhost:8000/api`.
+2. Make your backend return the shapes in `src/types` (or update the types). Errors should be JSON like `{ "message": "..." }`.
+3. **Auth.** The template expects cookie sessions: `POST /auth/login`, `POST /auth/signup`, `POST /auth/logout` and `GET /auth/me` (401 when signed out).
+   - If your backend is on another origin, it must allow your frontend's origin with credentials in its CORS settings. Alternatively, proxy it through Next.js (see `next.config.ts`).
+   - If your backend uses bearer tokens instead, add them in `prepareHeaders` in `src/store/api/baseApi.ts`.
+4. Delete `src/app/api` once you no longer need the mock.
+
+`AuthGuard` only controls what the UI shows. Your backend must check auth on every request.
+
+## Conventions
+
+- **File names:** `PascalCase.tsx` for components, `camelCase.ts` for everything else, `useSomething.ts` for hooks.
+- **Components:** arrow functions with a default export, with `/**VARIABLES */`, `/**FUNCTIONS */` and `/**COMPONENT */` sections.
+- **Imports:** always use the `@/` alias for `src/` (`@/components/ui/Button`) instead of long relative paths.
+- **Styling:** Tailwind classes; colors come from the tokens in `globals.css` (`bg-card`, `text-muted-foreground`, `border-border`...). Use `cn()` to combine classes.
+- **Tests:** next to the code they test, as `*.test.ts(x)`.
+
+## Learn more
+
+- [Next.js docs](https://nextjs.org/docs) (also bundled at `node_modules/next/dist/docs/`)
+- [Redux Toolkit](https://redux-toolkit.js.org/) and [RTK Query](https://redux-toolkit.js.org/rtk-query/overview)
+- [Tailwind CSS](https://tailwindcss.com/docs)
