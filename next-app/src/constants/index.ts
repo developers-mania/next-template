@@ -4,7 +4,7 @@ export const SITE = {
   name: "Next Template",
   description:
     "A Next.js + Redux starter for apps that talk to a separate backend.",
-  owner: "Info-Space Meta",
+  owner: "Developers Mania",
 } as const;
 
 export const ROUTES = {
@@ -15,6 +15,7 @@ export const ROUTES = {
   signup: "/signup",
   dashboard: "/dashboard",
   settings: "/settings",
+  books: "/books",
   project: (id: string) => `/projects/${id}`,
 } as const;
 
@@ -22,6 +23,7 @@ export const ROUTES = {
 export const MAIN_NAV = [
   { label: "About", href: ROUTES.about },
   { label: "Contact", href: ROUTES.contact },
+  { label: "Books", href: ROUTES.books },
 ] as const;
 
 /** Links shown in the signed-in app sidebar. */

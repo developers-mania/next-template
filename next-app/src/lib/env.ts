@@ -7,5 +7,5 @@
  */
 export const env = {
   /** Base URL of your backend API. Set NEXT_PUBLIC_API_URL in .env.local. */
-  apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+  apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1",
 } as const;
