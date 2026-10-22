@@ -1,14 +1,15 @@
+import { getProject, getProjects } from "@/lib/services/projects";
 import type { Project } from "@/types";
-import { baseApi } from "./baseApi";
+import { baseApi, fromService } from "./baseApi";
 
 export const projectsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
-      query: () => "/projects",
+      queryFn: () => fromService(getProjects()),
       providesTags: ["Project"],
     }),
     getProject: build.query<Project, string>({
-      query: (id) => `/projects/${id}`,
+      queryFn: (id) => fromService(getProject(id)),
       providesTags: ["Project"],
     }),
   }),

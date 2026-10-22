@@ -1,14 +1,15 @@
+import * as auth from "@/lib/services/auth";
 import type { LoginRequest, SignupRequest, User } from "@/types";
-import { baseApi } from "./baseApi";
+import { baseApi, fromService } from "./baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getMe: build.query<User, void>({
-      query: () => "/auth/me",
+      queryFn: () => fromService(auth.getMe()),
       providesTags: ["User"],
     }),
     login: build.mutation<User, LoginRequest>({
-      query: (body) => ({ url: "/auth/login", method: "POST", body }),
+      queryFn: (body) => fromService(auth.login(body)),
       // Put the returned user straight into the `getMe` cache so guarded pages render immediately.
       onQueryStarted: async (_body, { dispatch, queryFulfilled }) => {
         try {
@@ -20,7 +21,7 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
     signup: build.mutation<User, SignupRequest>({
-      query: (body) => ({ url: "/auth/signup", method: "POST", body }),
+      queryFn: (body) => fromService(auth.signup(body)),
       onQueryStarted: async (_body, { dispatch, queryFulfilled }) => {
         try {
           const { data: user } = await queryFulfilled;
@@ -31,7 +32,7 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
     logout: build.mutation<void, void>({
-      query: () => ({ url: "/auth/logout", method: "POST" }),
+      queryFn: () => fromService(auth.logout()),
     }),
   }),
 });

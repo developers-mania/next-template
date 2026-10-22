@@ -3,9 +3,10 @@
 A Next.js 16 starter for client-side apps that talk to a **separate backend**. It comes with:
 
 - **Next.js 16** (App Router, Turbopack), **React 19**, **TypeScript**, **Tailwind CSS 4**
-- **Redux Toolkit** for app state and **RTK Query** for API calls
+- **axios** for API calls, **Redux Toolkit** for app state and **RTK Query** for caching server data
 - The same design system and Developers Mania branding as the Vue template (see [UI and branding](#ui-and-branding))
-- A working example of every piece: public pages, login/signup, a protected dashboard, a dynamic route and a mock API
+- A working example of every piece: public pages, login/signup, a protected dashboard, a dynamic route and example API services
+- **Client only**: there are no Next.js API routes. Your backend lives elsewhere and is attached through `NEXT_PUBLIC_API_URL`
 - Lean tooling: ESLint, Prettier, Vitest + Testing Library, and GitHub Actions CI
 
 ## Quick start
@@ -14,12 +15,11 @@ Requires Node.js 20.9 or newer (see `.nvmrc`).
 
 ```bash
 npm install
+cp .env.example .env.local   # then set NEXT_PUBLIC_API_URL to your backend
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Log in with **demo@example.com / password**, or sign up.
-
-The template runs with no backend: requests go to a small mock API in `src/app/api`. To use your own backend, see [Connecting your backend](#connecting-your-backend).
+Open [http://localhost:3000](http://localhost:3000). The public pages work on their own; login and the dashboard need a backend. See [Connecting your backend](#connecting-your-backend).
 
 ## Scripts
 
@@ -69,8 +69,6 @@ src/
 │   │   │   └── _lib/             # Helpers private to the dashboard (+ their tests)
 │   │   ├── settings/             # /settings
 │   │   └── projects/[id]/        # /projects/1, /projects/2... (dynamic route)
-│   │
-│   └── api/                      # MOCK backend: delete once your real API is ready
 │
 ├── components/
 │   ├── ui/                       # Generic building blocks: Button, Card, Input, Badge, Spinner, State*
@@ -78,13 +76,14 @@ src/
 ├── constants/                    # SITE info, ROUTES, navigation links
 ├── hooks/                        # Shared React hooks (useAuth)
 ├── lib/                          # Shared helpers: cn(), formatDate(), env
+│   └── services/                 # axios instance (api.ts) + one file of request functions per feature
 ├── providers/                    # Client-side providers (Redux) wrapped around the app
 ├── store/
 │   ├── store.ts                  # makeStore + RootState/AppDispatch types
 │   ├── hooks.ts                  # useAppDispatch, useAppSelector (always use these)
 │   ├── selectors.ts              # Selectors
 │   ├── slices/                   # Redux slices (app state)
-│   └── api/                      # RTK Query endpoints (server data)
+│   └── api/                      # RTK Query endpoints that cache the services' data
 └── types/                        # Shared TypeScript types (match your API responses)
 ```
 
@@ -92,23 +91,23 @@ src/
 
 - **Route groups `(name)`.** A folder in brackets groups routes that share a layout, and the name stays out of the URL. `(app)/dashboard` is served at `/dashboard`.
 - **Private folders `_name`.** A folder starting with `_` is never a route, so `_components` and `_lib` hold code that belongs to one feature.
-- **Only `page.tsx` and `route.ts` become URLs.** Other files in `app/` are never served on their own.
+- **Only `page.tsx` becomes a URL.** Other files in `app/` are never served on their own. This template has no `route.ts` handlers: it is client only, and all data comes from your backend.
 - **Server Components are the default.** Add `"use client"` to the top of a file only when it needs state, effects, event handlers, browser APIs or Redux hooks. Pages stay Server Components so they can export `metadata`, and they render client components for the interactive parts (see `dashboard/page.tsx`).
 
 ## Where does my code go?
 
-| You're adding...                                      | Put it in                            |
-| ----------------------------------------------------- | ------------------------------------ |
-| A new page                                            | `src/app/(group)/your-page/page.tsx` |
-| A component used by **one** page or feature           | that feature's `_components/` folder |
-| A component used by **several** features              | `src/components/shared/`             |
-| A generic, reusable UI element (button, modal...)     | `src/components/ui/`                 |
-| A helper used by one feature                          | that feature's `_lib/` folder        |
-| A helper used everywhere                              | `src/lib/`                           |
-| Calls to a new backend endpoint                       | `src/store/api/` (see below)         |
-| App state shared between pages (UI state, filters...) | `src/store/slices/` (see below)      |
-| A type used in several places                         | `src/types/`                         |
-| A route path, nav link or app-wide setting            | `src/constants/`                     |
+| You're adding...                                      | Put it in                                          |
+| ----------------------------------------------------- | -------------------------------------------------- |
+| A new page                                            | `src/app/(group)/your-page/page.tsx`               |
+| A component used by **one** page or feature           | that feature's `_components/` folder               |
+| A component used by **several** features              | `src/components/shared/`                           |
+| A generic, reusable UI element (button, modal...)     | `src/components/ui/`                               |
+| A helper used by one feature                          | that feature's `_lib/` folder                      |
+| A helper used everywhere                              | `src/lib/`                                         |
+| Calls to a new backend endpoint                       | `src/lib/services/` + `src/store/api/` (see below) |
+| App state shared between pages (UI state, filters...) | `src/store/slices/` (see below)                    |
+| A type used in several places                         | `src/types/`                                       |
+| A route path, nav link or app-wide setting            | `src/constants/`                                   |
 
 If a feature-level piece starts being used somewhere else, move it up to the shared folder.
 
@@ -125,18 +124,36 @@ Avoid copying API data into slices. RTK Query already caches it.
 
 ### Add an API endpoint
 
-```ts
-// src/store/api/projectsApi.ts
-createProject: build.mutation<Project, Pick<Project, "name" | "description">>({
-  query: (body) => ({ url: "/projects", method: "POST", body }),
-  invalidatesTags: ["Project"], // refetches every query that provides "Project"
-}),
+Requests are made with axios in `src/lib/services/`, then wrapped in RTK Query for caching.
 
-// then export the generated hook
-export const { useCreateProjectMutation } = projectsApi;
-```
+1. Add a service function that uses the shared `api` instance:
 
-For a new feature, create a file next to `projectsApi.ts` that calls `baseApi.injectEndpoints(...)`.
+   ```ts
+   // src/lib/services/projects.ts
+   export const createProject = async (
+     body: Pick<Project, "name" | "description">,
+   ) => {
+     const { data } = await api.post<Project>("/projects", body);
+     return data;
+   };
+   ```
+
+2. Expose it through RTK Query with `fromService`, which turns axios errors into an `ApiError`:
+
+   ```ts
+   // src/store/api/projectsApi.ts
+   createProject: build.mutation<Project, Pick<Project, "name" | "description">>({
+     queryFn: (body) => fromService(createProject(body)),
+     invalidatesTags: ["Project"], // refetches every query that provides "Project"
+   }),
+
+   // then export the generated hook
+   export const { useCreateProjectMutation } = projectsApi;
+   ```
+
+Service functions are plain async functions, so you can also call them directly (`await getProjects()`) where you don't need caching.
+
+For a new feature, create `src/lib/services/<feature>.ts` and a `src/store/api/<feature>Api.ts` that calls `baseApi.injectEndpoints(...)`.
 
 ### Add a slice
 
@@ -147,12 +164,12 @@ For a new feature, create a file next to `projectsApi.ts` that calls `baseApi.in
 
 ## Connecting your backend
 
-1. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_URL`, e.g. `http://localhost:8000/api`.
+1. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_API_URL`, e.g. `http://localhost:8000/api`. Without it, requests go to `http://localhost:8000/api`.
 2. Make your backend return the shapes in `src/types` (or update the types). Errors should be JSON like `{ "message": "..." }`.
-3. **Auth.** The template expects cookie sessions: `POST /auth/login`, `POST /auth/signup`, `POST /auth/logout` and `GET /auth/me` (401 when signed out).
+3. **Endpoints.** The examples call `GET /projects`, `GET /projects/:id` (`src/lib/services/projects.ts`) and the auth endpoints below.
+4. **Auth.** The template expects cookie sessions: `POST /auth/login`, `POST /auth/signup`, `POST /auth/logout` and `GET /auth/me` (401 when signed out). See `src/lib/services/auth.ts`.
    - If your backend is on another origin, it must allow your frontend's origin with credentials in its CORS settings. Alternatively, proxy it through Next.js (see `next.config.ts`).
-   - If your backend uses bearer tokens instead, add them in `prepareHeaders` in `src/store/api/baseApi.ts`.
-4. Delete `src/app/api` once you no longer need the mock.
+   - If your backend uses bearer tokens instead, attach them in the request interceptor in `src/lib/services/api.ts`. Its response interceptor sends the user to the login page on a 401 from any non-`/auth/` request.
 
 `AuthGuard` only controls what the UI shows. Your backend must check auth on every request.
 
