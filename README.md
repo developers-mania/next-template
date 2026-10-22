@@ -10,4 +10,4 @@ npm install
 npm run dev
 ```
 
-Then open [http://localhost:3000](http://localhost:3000) and log in with **demo@example.com / password**.
+Set `NEXT_PUBLIC_API_URL` in `next-app/.env.local` to your backend, then open [http://localhost:3000](http://localhost:3000).

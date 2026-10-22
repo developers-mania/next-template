@@ -16,6 +16,20 @@ export type Project = {
   updatedAt: string;
 };
 
+export type Author = {
+  id: string;
+  name: string;
+};
+
+export type Book = {
+  id: string;
+  title: string;
+  description: string;
+  author: Author;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type LoginRequest = {
   email: string;
   password: string;

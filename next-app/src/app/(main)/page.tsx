@@ -41,7 +41,7 @@ const HIGHLIGHTS = [
   },
   {
     title: "Bring your own backend",
-    body: "A mock API runs out of the box. Point NEXT_PUBLIC_API_URL at your server to swap it.",
+    body: "Client only: axios services talk to your API. Point NEXT_PUBLIC_API_URL at your server.",
   },
   {
     title: "Ready to ship",

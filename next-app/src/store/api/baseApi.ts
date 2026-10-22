@@ -1,23 +1,25 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { env } from "@/lib/env";
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
+import { toApiError, type ApiError } from "@/lib/services/api";
 
 /**
- * The single RTK Query API that talks to your backend.
+ * The single RTK Query API. Requests themselves are made with axios in lib/services;
+ * RTK Query adds caching, loading and error states on top.
  * Each feature adds its endpoints with `baseApi.injectEndpoints` (see authApi.ts, projectsApi.ts).
  */
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: env.apiUrl,
-    // Send cookies with every request (session/cookie auth).
-    // A backend on another origin must allow credentials in its CORS settings.
-    credentials: "include",
-    // Using bearer tokens instead? Attach them here:
-    // prepareHeaders: (headers) => {
-    //   headers.set("Authorization", `Bearer ${token}`);
-    //   return headers;
-    // },
-  }),
+  baseQuery: fakeBaseQuery<ApiError>(),
   tagTypes: ["User", "Project"],
   endpoints: () => ({}),
 });
+
+/** Run a service call inside an endpoint's `queryFn`: `queryFn: () => fromService(getProjects())`. */
+export const fromService = async <T>(
+  request: Promise<T>,
+): Promise<{ data: T } | { error: ApiError }> => {
+  try {
+    return { data: await request };
+  } catch (error) {
+    return { error: toApiError(error) };
+  }
+};

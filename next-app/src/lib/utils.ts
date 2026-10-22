@@ -10,21 +10,18 @@ export const formatDate = (value: string) =>
     new Date(value),
   );
 
-/** Pull a readable message out of an RTK Query error (expects `{ message }` from the backend). */
+/** Pull a readable message out of an RTK Query error (an `ApiError` from lib/services/api). */
 export const getErrorMessage = (
   error: unknown,
   fallback = "Something went wrong",
 ) => {
-  if (error && typeof error === "object" && "data" in error) {
-    const { data } = error;
-    if (
-      data &&
-      typeof data === "object" &&
-      "message" in data &&
-      typeof data.message === "string"
-    ) {
-      return data.message;
-    }
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
   }
   return fallback;
 };
